@@ -1,0 +1,71 @@
+interface csc2cmac_data_if
+  flow valid
+  field batch_index 5
+  field stripe_st 1
+  field stripe_end 1
+  field channel_end 1
+  field layer_end 1
+  field mask PICO_MAC_ATOMIC_C_SIZE
+  field data[PICO_MAC_ATOMIC_C_SIZE] PICO_BPE
+
+interface csc2cmac_wt_if
+  flow valid
+  field data[PICO_MAC_ATOMIC_C_SIZE]  PICO_BPE
+  field mask PICO_MAC_ATOMIC_C_SIZE
+  field sel PICO_MAC_ATOMIC_K_SIZE_DIV2
+
+interface cmac2cacc_if
+  flow valid
+  field data[PICO_MAC_ATOMIC_K_SIZE_DIV2] PICO_MAC_RESULT_WIDTH
+  field mask  PICO_MAC_ATOMIC_K_SIZE_DIV2
+  field mode  1
+  field batch_index 5
+  field stripe_st 1
+  field stripe_end 1
+  field channel_end 1
+  field layer_end 1
+
+interface cacc2sdp_if
+  flow valid_ready
+  field pd[PICO_SDP_MAX_THROUGHPUT]  PICO_CACC_SDP_SINGLE_THROUGHPUT
+  field pd_batch_end  1
+  field pd_layer_end  1
+
+
+interface sdp2pdp_if
+  flow valid_ready
+  field pd[PICO_SDP_MAX_THROUGHPUT] PICO_BPE
+
+group DMA_READ_REQ
+  field addr PICO_MEM_ADDRESS_WIDTH
+  field size PICO_DMA_RD_SIZE
+
+group DMA_READ_RSP
+  field data PICO_MEMIF_WIDTH
+  field mask PICO_DMA_MASK_BIT
+
+group DMA_WR_REQ
+  field addr PICO_MEM_ADDRESS_WIDTH
+  field size PICO_DMA_WR_SIZE
+
+group DMA_WR_DATA
+  field data PICO_MEMIF_WIDTH
+  field mask PICO_DMA_MASK_BIT
+
+interface pico_dma_rd_req
+    flow    valid_ready
+    packet  DMA_READ_REQ
+
+interface pico_dma_rd_rsp
+    flow    valid_ready
+    packet  DMA_READ_RSP
+
+interface pico_dma_wr_req
+    flow    valid_ready
+    packet  DMA_WR_REQ DMA_WR_DATA
+
+interface pico_dma_wr_rsp
+    field   complete 1
+
+
+

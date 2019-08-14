@@ -1,0 +1,48 @@
+                                            // rdl input parameters
+global {
+                                            // use_js_address_alignment = false
+    allow_unordered_addresses = true
+    suppress_alignment_warnings = true
+}
+input rdl {
+    resolve_reg_category = true             // if register category is unspecified, try to determine from rdl
+    restrict_defined_property_names = false
+}
+
+                                            // systemverilog output parameters
+output systemverilog {
+	leaf_address_size = 32                  // leaf address bits
+	base_addr_is_parameter = false          // base address parameter will be added to top module
+	use_gated_logic_clock = false           // use separate gated clock for registers
+	always_generate_iwrap = false           // create int wrapper mod even if none specified in rdl
+	suppress_no_reset_warnings = true       // inhibit field no reset messages
+	include_default_coverage = false        // include default cover points in rtl
+	use_async_resets = true                 // registers will use asynchronous reset
+    //root_decoder_interface = parallel_pulsed // parallel | parallel_pulsed | leaf | serial8 | ring8 | ring16 | ring32 
+}
+
+                                            // jspec output parameters
+output jspec {
+	root_regset_is_instanced = true         // instance the root or make it a typedef?
+}
+
+                                            // reglist output parameters
+output reglist {
+	display_external_regs = true            // include external regs in output?
+	show_reg_type = false                   // show int/ext type for each reg?
+	show_fields = false                     // show field info for each reg
+}
+
+                                            // uvmregs output parameters
+output uvmregs {
+	suppress_no_category_warnings = true    // inhibit reg no category messages
+	include_address_coverage = false        // include address coverage in model
+	reuse_uvm_classes = false               // allow reuse of classes in model
+    uvm_model_mode = native                 // set uvm model type (heavy | lite1 | native)
+    regs_use_factory = true
+}
+
+                                            // xml output parameters
+output xml {
+    include_field_hw_info = true
+}

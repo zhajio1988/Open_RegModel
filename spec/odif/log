@@ -1,0 +1,10 @@
+../../tools/bin/vcp -i ./example.interface.odif -o /huaihe/proj/ic/wa/jiongz/work/soc_dv/verify_common/regmodel/outdir/pico_def_demo/spec/odif/./example.interface.odif -imacros ../../outdir/pico_def_demo/spec/defs/project.h -cpp /usr/bin/cpp 
+../../tools/bin/vcp -i ./example.module.odif -o /huaihe/proj/ic/wa/jiongz/work/soc_dv/verify_common/regmodel/outdir/pico_def_demo/spec/odif/./example.module.odif -imacros ../../outdir/pico_def_demo/spec/defs/project.h -cpp /usr/bin/cpp 
+../../tools/bin/vcp -i ./example.top.odif -o /huaihe/proj/ic/wa/jiongz/work/soc_dv/verify_common/regmodel/outdir/pico_def_demo/spec/odif/./example.top.odif -imacros ../../outdir/pico_def_demo/spec/defs/project.h -cpp /usr/bin/cpp 
+../../tools/bin/vcp -i ./pico.interface.odif -o /huaihe/proj/ic/wa/jiongz/work/soc_dv/verify_common/regmodel/outdir/pico_def_demo/spec/odif/./pico.interface.odif -imacros ../../outdir/pico_def_demo/spec/defs/project.h -cpp /usr/bin/cpp 
+../../tools/bin/vcp -i ./pico.module.odif -o /huaihe/proj/ic/wa/jiongz/work/soc_dv/verify_common/regmodel/outdir/pico_def_demo/spec/odif/./pico.module.odif -imacros ../../outdir/pico_def_demo/spec/defs/project.h -cpp /usr/bin/cpp 
+../../tools/bin/vcp -i ./pico.top.odif -o /huaihe/proj/ic/wa/jiongz/work/soc_dv/verify_common/regmodel/outdir/pico_def_demo/spec/odif/./pico.top.odif -imacros ../../outdir/pico_def_demo/spec/defs/project.h -cpp /usr/bin/cpp 
+/usr/bin/perl  /huaihe/proj/ic/wa/jiongz/work/soc_dv/verify_common/regmodel/spec/odif/ODIF2others.pl -o /huaihe/proj/ic/wa/jiongz/work/soc_dv/verify_common/regmodel/outdir/pico_def_demo/spec/odif -f /huaihe/proj/ic/wa/jiongz/work/soc_dv/verify_common/regmodel/outdir/pico_def_demo/spec/odif/pico.top.odif -c -sv -v -m
+==============================================
+files are generated under /huaihe/proj/ic/wa/jiongz/work/soc_dv/verify_common/regmodel/outdir/pico_def_demo/spec/odif
+==============================================
