@@ -1,6 +1,6 @@
 # openreg
 ---
-Use ORDT tools to generate register RTL, UVM register models, and docs using SystemRDL
+Use ORDT and systemRDL tools to generate C/Verilog header files, register RTL, UVM register models, and docs using SystemRDL.
 
 ## Directory Structure
 
@@ -15,15 +15,19 @@ In this repository, you will find:
 │       └── spec
 │           ├── defs
 │           ├── manual
-│           │   ├── hwa_wrapper_reg_c
-│           │   └── openreg_reg_c
+│           │   ├── accelera-generic_example
+│           │   │   └── docs
+│           │   ├── hwa_wrapper
+│           │   │   └── docs
 │           └── odif
 ├── spec
-│   ├── defs   -- define file location
-│   ├── manual -- *.rdl register description file location
-│   └── odif
+│   ├── defs            -- define file location(not used in our project)
+│   ├── manual          -- *.rdl register description file location
+│   │   └── RALBot-gen  -- ralbotgen python scripts(used to generate header file, uvm regmodel and html doc) 
+|   |
+│   └── odif            -- (not used in our project)
 │       └── gen
-└── tools
+└── tools               -- build tools
     ├── bin
     ├── etc
     └── make
