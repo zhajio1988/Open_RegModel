@@ -35,5 +35,5 @@ In this repository, you will find:
 
 ## Using the openreg tools
 
-    `%> ./tools/bin/tmake`
+`%> ./tools/bin/tmake`
 
