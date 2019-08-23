@@ -1,3 +1,3 @@
-//import PICO_CDP.rdl
-//import ral_demo.rdl
 import hwa_wrapper.rdl
+import test_write_enable.rdl
+import accelera-generic_example.rdl

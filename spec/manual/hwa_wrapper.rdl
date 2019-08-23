@@ -72,17 +72,16 @@ regfile regs_ral_demo{
         swcfg_field en[31:31] = 1'd1;
         field {rclr; hw=w; we; } subch[30:26] = 5'd0;
         field {rclr; hw=w; we; 
-                sub_category = "INFO";
               } str[25:16] = 10'd0;
     } RCNT_SAT @0xc;      
     
 };
 
-addrmap {
+addrmap  addrmap_top{
     name = "ATXMEGA SPI controller";
     desc = "Register description of Atmel XMEGA AU's SPI controller
     Transcribed from original manual as an example exercise:
     http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8331-8-and-16-bit-AVR-Microcontroller-XMEGA-AU_Manual.pdf";
     signal { activelow; field_reset; cpuif_reset;} reset_n;
     regs_ral_demo ral_regs_demo @0x0;
-}addrmap_PICO;
+} addrmap_hwa_wrapper;

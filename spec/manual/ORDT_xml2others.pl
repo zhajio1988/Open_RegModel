@@ -596,285 +596,285 @@ sub emit_c
   close FILE; 
 }
 
-sub emit_py
-{
-  my $content="";
-  $content.=sprintf("registers         = {}\n");
-  $content.=sprintf("addr_spaces       = {}\n\n");
-  foreach my $key_regfile(@regsets){
-    %regfile=%{$key_regfile};
-    $regfile_name=${$regfile{id}}[0];
-    @regs=@{$regfile{reg}};
-    foreach my $key_reg(@regs){
-        my $reg_reps;
-        my $reg_incr;
-        %reg=%{$key_reg};
-        $reg_baseaddr=${$reg{baseaddr}}[0];
-        my $reset_val=0;
-        my $reset_mask=0;
-        my $sw_default=0;
-        my $sw_default_mask=0;
-        my $read_mask=0;
-        my $write_mask=0;
-        $reg_name=${$reg{id}}[0];
-        if(exists $reg{'reps'}){
-            $reg_reps=${$reg{reps}}[0];
-            if ($reg_baseaddr =~ /0x|0X/) {                    
-                $reg_baseaddr = hex($reg_baseaddr);
-            } elsif($reg_baseaddr =~ /\A0|0b\d+/) {
-                $reg_baseaddr = oct($reg_baseaddr);
-            }
-        } else{
-            $reg_reps=-1;  
-            if($reg_baseaddr !~ /0x|0X/)
-            {
-                if($reg_baseaddr =~ /\A0|0b\d+/){
-                    $reg_baseaddr = oct($reg_baseaddr);
-                }
-                $reg_baseaddr = sprintf("0x%x",$reg_baseaddr);    
-            }
-        }
-        if(exists $reg{'stride'}){
-            $reg_incr=${$reg{stride}}[0];
-            if ($reg_incr =~ /0x|0X/) {        
-                $reg_incr = hex($reg_incr);
-            } elsif($reg_incr =~ /\A0|0b\d+/) {
-                $reg_incr = oct($reg_incr);
-            }
-        }else{
-            $reg_incr=0;   
-        }
-        @fields=@{$reg{field}};
-        %field_information=();
-        $min=0;
-        $max=0;
-        my $first=1;
-        $max_tmp=0;
-        foreach my $key_field (@fields){
-            %field=%{$key_field};
-            $field_name=${$field{id}}[0];
-            if($first==1)
-            {
-                $min=${$field{lowidx}}[0];
-                $max=${$field{width}}[0]-1+${$field{lowidx}}[0];
-                $first=0;
-            }else{
-                 if(${$field{lowidx}}[0]<$min)
-                 {
-                    $min=${$field{lowidx}}[0];
-                 }
-                 $max_tmp=${$field{width}}[0]-1+${$field{lowidx}}[0];
-                 if($max_tmp>$max)
-                 {   
-                    $max=$max_tmp;
-                 }
-            }
-            $field_information{$field_name}{shift}=${$field{lowidx}}[0];
-            $field_information{$field_name}{width}=${$field{width}}[0];
-            $field_width=${$field{width}}[0];
-            $field_mask="0b"."1"x$field_width;
-            $field_information{$field_name}{mask}=oct($field_mask);
-            $field_information{$field_name}{reset}=hex(${$field{reset}}[0]);
-            if(exists $field{'enum_encode'})
-            {
-                %enum_encode=%{${$field{enum_encode}}[0]};
-                @enum_elems=@{$enum_encode{enc_elem}};
-                foreach my $index (@enum_elems){
-                    my %enum=%{$index};
-                    my $enum_value=${$enum{enc_elem_value}}[0];
-                    if ($enum_value =~ /0x|0X/) {                   
-                        $enum_value = hex($enum_value);
-                    } elsif($enum_value =~ /\A0|0b\d+/) {
-                        $enum_value = oct($enum_value); 
-                    }
-                    $field_information{$field_name}{enums}{${$enum{enc_elem_name}}[0]}=$enum_value;
-                }
-            }
-            %usr_pro=%{${$field{user_properties}}[0]};
-            $field_information{$field_name}{sw_default}=hex(${$usr_pro{spec_sw_default}}[0]); 
-            $field_information{$field_name}{sw_default_mask}=hex(${$usr_pro{sw_default_mask}}[0]);
-            $field_information{$field_name}{reset_mask}=hex(${$usr_pro{reset_mask}}[0]);
-            $field_information{$field_name}{usr_access}=${$usr_pro{spec_access}}[0];
-            if (${$field{access}}[0]=~/R.*/i)
-            {
-                $field_information{$field_name}{read_mask}=$field_information{$field_name}{mask};   
-            }
-            else
-            {
-                $field_information{$field_name}{read_mask}=0;
-            }
-            if (${$field{access}}[0]=~/W.*/i)    
-            {
-                $field_information{$field_name}{write_mask}=$field_information{$field_name}{mask};
-            }
-            else
-            {
-                $field_information{$field_name}{write_mask}=0;
-            }
-        }
-        @fields_sort=sort{$field_information{$a}{shift} <=> $field_information{$b}{shift}} keys %field_information;
-        foreach my $key(@fields_sort){
-            $reset_val |= ($field_information{$key}{reset} & $field_information{$key}{mask}) << $field_information{$key}{shift};
-            $reset_mask |= ($field_information{$key}{reset_mask} & $field_information{$key}{mask}) << $field_information{$key}{shift};
-            $sw_default |= ($field_information{$key}{sw_default} & $field_information{$key}{mask}) << $field_information{$key}{shift};
-            $sw_default_mask |= ($field_information{$key}{sw_default_mask} & $field_information{$key}{mask}) << $field_information{$key}{shift};
-            $read_mask |= ($field_information{$key}{read_mask} & $field_information{$key}{mask}) << $field_information{$key}{shift};
-            $write_mask |= ($field_information{$key}{write_mask} & $field_information{$key}{mask}) << $field_information{$key}{shift};
-        }
-
-        if($reg_reps==-1){
-            $content.=sprintf("# Register %s_%s_0\n",$regfile_name,$reg_name);
-            $content.=sprintf("if '%s' not in registers:\n",$regfile_name);
-            $content.=sprintf("    registers['%s'] = {}\n",$regfile_name);
-            $content.=sprintf("    registers['%s']['register_list']  = []\n\n",$regfile_name);
-            $content.=sprintf("registers['%s']['%s_0'] = {\n",$regfile_name,$reg_name);
-            $content.=sprintf("    'addr'            : %s,\n",$reg_baseaddr);    
-            $content.=sprintf("    'size'            : 0x%x,\n",$max-$min+1);
-            $content.=sprintf("    'reset_val'       : 0x%x,\n",$reset_val);
-            $content.=sprintf("    'reset_mask'      : 0x%x,\n",$reset_mask);
-            $content.=sprintf("    'sw_default_val'  : 0x%x,\n",$sw_default);
-            $content.=sprintf("    'sw_default_mask' : 0x%x,\n",$sw_default_mask);
-            $content.=sprintf("    'read_mask'       : 0x%x,\n",$read_mask);
-            $content.=sprintf("    'write_mask'      : 0x%x,\n",$write_mask); 
-            foreach my $key (@fields_sort){
-                $content.=sprintf("    '%s' : {\n",$key);
-                $content.=sprintf("        'lsb'               : %d,\n",$field_information{$key}{shift});
-                $content.=sprintf("        'msb'               : %d,\n",$field_information{$key}{width}-1+$field_information{$key}{shift});
-                $content.=sprintf("        'size'              : %d,\n",$field_information{$key}{width});
-                $content.=sprintf("        'field'             : (0x%x << %d),\n",$field_information{$key}{mask},$field_information{$key}{shift});
-                $content.=sprintf("        'default'           : 0x%x,\n",$field_information{$key}{reset});
-                $content.=sprintf("        'sw_default'        : 0x%x,\n",$field_information{$key}{sw_default});
-                $content.=sprintf("        'action'            : '%s',\n",$field_information{$key}{usr_access});
-                $content.=sprintf("        'enums' : {\n");
-                if(exists $field_information{$key}{enums})
-                {
-                    my %enums=%{$field_information{$key}{enums}};
-                    my @enums_sort=sort{$enums{$a} <=> $enums{$b}} keys %enums;
-                    foreach my $enum_name (@enums_sort){
-                        $content.=sprintf("            '%s' : 0x%x,\n",$enum_name,$enums{$enum_name});
-                    }
-                }
-                $content.=sprintf("        },\n");
-                $content.=sprintf("    },\n");
-            }
-            $content.=sprintf("    # Fields sorted in order of declaration in register\n");
-            $content.=sprintf("    'field_list' : [\n");
-            foreach my $key (@fields_sort){
-                $content.=sprintf("        '%s',\n",$key);
-            }
-            $content.=sprintf("    ],\n");
-            $content.=sprintf("} # End of register: %s_0\n\n",$reg_name);
-            $content.=sprintf("registers['%s']['register_list'].append('%s_0')\n\n",$regfile_name,$reg_name);
-        }else{
-            $content.=sprintf("# Register %s_%s\n",$regfile_name,$reg_name);
-            $content.=sprintf("if '%s' not in registers:\n",$regfile_name);
-            $content.=sprintf("    registers['%s'] = {}\n",$regfile_name);
-            $content.=sprintf("    registers['%s']['register_list']  = []\n\n",$regfile_name);
-            $content.=sprintf("registers['%s']['%s'] = {\n",$regfile_name,$reg_name);
-            $content.=sprintf("    'addr'            : 0x%x,\n",$reg_baseaddr);
-            $content.=sprintf("    'size'            : 0x%x,\n",$max-$min+1);
-            $content.=sprintf("    'reset_val'       : 0x%x,\n",$reset_val);
-            $content.=sprintf("    'reset_mask'      : 0x%x,\n",$reset_mask);
-            $content.=sprintf("    'sw_default_val'  : 0x%x,\n",$sw_default);
-            $content.=sprintf("    'sw_default_mask' : 0x%x,\n",$sw_default_mask);
-            $content.=sprintf("    'read_mask'       : 0x%x,\n",$read_mask);
-            $content.=sprintf("    'write_mask'      : 0x%x,\n",$write_mask);
-            foreach my $key (@fields_sort){
-                $content.=sprintf("    '%s' : {\n",$key);
-                $content.=sprintf("        'lsb'               : %d,\n",$field_information{$key}{shift});
-                $content.=sprintf("        'msb'               : %d,\n",$field_information{$key}{width}-1+$field_information{$key}{shift});
-                $content.=sprintf("        'size'              : %d,\n",$field_information{$key}{width});
-                $content.=sprintf("        'field'             : (0x%x << %d),\n",$field_information{$key}{mask},$field_information{$key}{shift});
-                $content.=sprintf("        'default'           : 0x%x,\n",$field_information{$key}{reset});
-                $content.=sprintf("        'sw_default'        : 0x%x,\n",$field_information{$key}{sw_default});
-                $content.=sprintf("        'action'            : '%s',\n",$field_information{$key}{usr_access});
-                $content.=sprintf("        'enums' : {\n");
-                if(exists $field_information{$key}{enums})
-                {
-                    my %enums=%{$field_information{$key}{enums}};
-                    my @enums_sort=sort{$enums{$a} <=> $enums{$b}} keys %enums;
-                    foreach my $enum_name (@enums_sort){
-                        $content.=sprintf("            '%s' : 0x%x,\n",$enum_name,$enums{$enum_name});
-                    }
-                }
-                $content.=sprintf("        },\n");
-                $content.=sprintf("    },\n");
-            }
-            $content.=sprintf("    # Fields sorted in order of declaration in register\n");
-            $content.=sprintf("    'field_list' : [\n");
-            foreach my $key (@fields_sort){
-                $content.=sprintf("        '%s',\n",$key);
-            }
-            $content.=sprintf("    ],\n");
-            $content.=sprintf("} # End of register: %s\n\n",$reg_name);
-            $content.=sprintf("registers['%s']['register_list'].append('%s')\n\n",$regfile_name,$reg_name);
-            foreach my $index (0..$reg_reps-1){
-                $reg_addr=$reg_baseaddr+$reg_incr*$index;
-                $content.=sprintf("# Register %s_%s_%d\n",$regfile_name,$reg_name,$index);
-                $content.=sprintf("if '%s' not in registers:\n",$regfile_name);
-                $content.=sprintf("    registers['%s'] = {}\n",$regfile_name);
-                $content.=sprintf("    registers['%s']['register_list']  = []\n\n",$regfile_name);
-                $content.=sprintf("registers['%s']['%s_%d'] = {\n",$regfile_name,$reg_name,$index);
-                $content.=sprintf("    'addr'            : 0x%x,\n",$reg_addr);
-                $content.=sprintf("    'size'            : 0x%x,\n",$max-$min+1);
-                $content.=sprintf("    'reset_val'       : 0x%x,\n",$reset_val);
-                $content.=sprintf("    'reset_mask'      : 0x%x,\n",$reset_mask);
-                $content.=sprintf("    'sw_default_val'  : 0x%x,\n",$sw_default);
-                $content.=sprintf("    'sw_default_mask' : 0x%x,\n",$sw_default_mask);
-                $content.=sprintf("    'read_mask'       : 0x%x,\n",$read_mask);
-                $content.=sprintf("    'write_mask'      : 0x%x,\n",$write_mask);
-                foreach my $key (@fields_sort){
-                    $content.=sprintf("    '%s' : {\n",$key);
-                    $content.=sprintf("        'lsb'               : %d,\n",$field_information{$key}{shift});
-                    $content.=sprintf("        'msb'               : %d,\n",$field_information{$key}{width}-1+$field_information{$key}{shift});
-                    $content.=sprintf("        'size'              : %d,\n",$field_information{$key}{width});
-                    $content.=sprintf("        'field'             : (0x%x << %d),\n",$field_information{$key}{mask},$field_information{$key}{shift});
-                    $content.=sprintf("        'default'           : 0x%x,\n",$field_information{$key}{reset});
-                    $content.=sprintf("        'sw_default'        : 0x%x,\n",$field_information{$key}{sw_default});
-                    $content.=sprintf("        'action'            : '%s',\n",$field_information{$key}{usr_access});
-                    $content.=sprintf("        'enums' : {\n");
-                    if(exists $field_information{$key}{enums})
-                    {
-                        my %enums=%{$field_information{$key}{enums}};
-                        my @enums_sort=sort{$enums{$a} <=> $enums{$b}} keys %enums;
-                        foreach my $enum_name (@enums_sort){
-                            $content.=sprintf("            '%s' : 0x%x,\n",$enum_name,$enums{$enum_name});
-                        }
-                    }
-                    $content.=sprintf("        },\n"); 
-                    $content.=sprintf("    },\n");
-               }
-               $content.=sprintf("    # Fields sorted in order of declaration in register\n");
-               $content.=sprintf("    'field_list' : [\n");
-               foreach my $key (@fields_sort){
-                    $content.=sprintf("        '%s',\n",$key);
-               }
-               $content.=sprintf("    ],\n");
-               $content.=sprintf("} # End of register: %s_%d\n\n",$reg_name,$index);
-               $content.=sprintf("registers['%s']['register_list'].append('%s_%d')\n\n",$regfile_name,$reg_name,$index); 
-            }
-        }
-        $content.="\n\n";
-     }
-  }
-  $content.=sprintf("\n##\n## ADDRESS SPACES\n##\n\n");
-  foreach my $key_regfile(@regsets){
-    %regfile=%{$key_regfile};
-    $regfile_name=${$regfile{id}}[0];
-    $regfile_baseaddr=${$regfile{baseaddr}}[0];
-    if($regfile_baseaddr !~ /0x|0X/)
-    {
-        if($regfile_baseaddr =~ /\A0|0b\d+/){
-            $regfile_baseaddr = oct($regfile_baseaddr);
-        }
-        $regfile_baseaddr = sprintf("0x%x",$regfile_baseaddr);
-    }
-    $content.=sprintf("addr_spaces['%s'] = %s;\n",$regfile_name,$regfile_baseaddr);
-  }
-  open FILE,'>',"$OutDir/$basename.py" or die $!;
-  print FILE $content;
-  close FILE; 
-}
+#sub emit_py
+#{
+#  my $content="";
+#  $content.=sprintf("registers         = {}\n");
+#  $content.=sprintf("addr_spaces       = {}\n\n");
+#  foreach my $key_regfile(@regsets){
+#    %regfile=%{$key_regfile};
+#    $regfile_name=${$regfile{id}}[0];
+#    @regs=@{$regfile{reg}};
+#    foreach my $key_reg(@regs){
+#        my $reg_reps;
+#        my $reg_incr;
+#        %reg=%{$key_reg};
+#        $reg_baseaddr=${$reg{baseaddr}}[0];
+#        my $reset_val=0;
+#        my $reset_mask=0;
+#        my $sw_default=0;
+#        my $sw_default_mask=0;
+#        my $read_mask=0;
+#        my $write_mask=0;
+#        $reg_name=${$reg{id}}[0];
+#        if(exists $reg{'reps'}){
+#            $reg_reps=${$reg{reps}}[0];
+#            if ($reg_baseaddr =~ /0x|0X/) {                    
+#                $reg_baseaddr = hex($reg_baseaddr);
+#            } elsif($reg_baseaddr =~ /\A0|0b\d+/) {
+#                $reg_baseaddr = oct($reg_baseaddr);
+#            }
+#        } else{
+#            $reg_reps=-1;  
+#            if($reg_baseaddr !~ /0x|0X/)
+#            {
+#                if($reg_baseaddr =~ /\A0|0b\d+/){
+#                    $reg_baseaddr = oct($reg_baseaddr);
+#                }
+#                $reg_baseaddr = sprintf("0x%x",$reg_baseaddr);    
+#            }
+#        }
+#        if(exists $reg{'stride'}){
+#            $reg_incr=${$reg{stride}}[0];
+#            if ($reg_incr =~ /0x|0X/) {        
+#                $reg_incr = hex($reg_incr);
+#            } elsif($reg_incr =~ /\A0|0b\d+/) {
+#                $reg_incr = oct($reg_incr);
+#            }
+#        }else{
+#            $reg_incr=0;   
+#        }
+#        @fields=@{$reg{field}};
+#        %field_information=();
+#        $min=0;
+#        $max=0;
+#        my $first=1;
+#        $max_tmp=0;
+#        foreach my $key_field (@fields){
+#            %field=%{$key_field};
+#            $field_name=${$field{id}}[0];
+#            if($first==1)
+#            {
+#                $min=${$field{lowidx}}[0];
+#                $max=${$field{width}}[0]-1+${$field{lowidx}}[0];
+#                $first=0;
+#            }else{
+#                 if(${$field{lowidx}}[0]<$min)
+#                 {
+#                    $min=${$field{lowidx}}[0];
+#                 }
+#                 $max_tmp=${$field{width}}[0]-1+${$field{lowidx}}[0];
+#                 if($max_tmp>$max)
+#                 {   
+#                    $max=$max_tmp;
+#                 }
+#            }
+#            $field_information{$field_name}{shift}=${$field{lowidx}}[0];
+#            $field_information{$field_name}{width}=${$field{width}}[0];
+#            $field_width=${$field{width}}[0];
+#            $field_mask="0b"."1"x$field_width;
+#            $field_information{$field_name}{mask}=oct($field_mask);
+#            $field_information{$field_name}{reset}=hex(${$field{reset}}[0]);
+#            if(exists $field{'enum_encode'})
+#            {
+#                %enum_encode=%{${$field{enum_encode}}[0]};
+#                @enum_elems=@{$enum_encode{enc_elem}};
+#                foreach my $index (@enum_elems){
+#                    my %enum=%{$index};
+#                    my $enum_value=${$enum{enc_elem_value}}[0];
+#                    if ($enum_value =~ /0x|0X/) {                   
+#                        $enum_value = hex($enum_value);
+#                    } elsif($enum_value =~ /\A0|0b\d+/) {
+#                        $enum_value = oct($enum_value); 
+#                    }
+#                    $field_information{$field_name}{enums}{${$enum{enc_elem_name}}[0]}=$enum_value;
+#                }
+#            }
+#            %usr_pro=%{${$field{user_properties}}[0]};
+#            $field_information{$field_name}{sw_default}=hex(${$usr_pro{spec_sw_default}}[0]); 
+#            $field_information{$field_name}{sw_default_mask}=hex(${$usr_pro{sw_default_mask}}[0]);
+#            $field_information{$field_name}{reset_mask}=hex(${$usr_pro{reset_mask}}[0]);
+#            $field_information{$field_name}{usr_access}=${$usr_pro{spec_access}}[0];
+#            if (${$field{access}}[0]=~/R.*/i)
+#            {
+#                $field_information{$field_name}{read_mask}=$field_information{$field_name}{mask};   
+#            }
+#            else
+#            {
+#                $field_information{$field_name}{read_mask}=0;
+#            }
+#            if (${$field{access}}[0]=~/W.*/i)    
+#            {
+#                $field_information{$field_name}{write_mask}=$field_information{$field_name}{mask};
+#            }
+#            else
+#            {
+#                $field_information{$field_name}{write_mask}=0;
+#            }
+#        }
+#        @fields_sort=sort{$field_information{$a}{shift} <=> $field_information{$b}{shift}} keys %field_information;
+#        foreach my $key(@fields_sort){
+#            $reset_val |= ($field_information{$key}{reset} & $field_information{$key}{mask}) << $field_information{$key}{shift};
+#            $reset_mask |= ($field_information{$key}{reset_mask} & $field_information{$key}{mask}) << $field_information{$key}{shift};
+#            $sw_default |= ($field_information{$key}{sw_default} & $field_information{$key}{mask}) << $field_information{$key}{shift};
+#            $sw_default_mask |= ($field_information{$key}{sw_default_mask} & $field_information{$key}{mask}) << $field_information{$key}{shift};
+#            $read_mask |= ($field_information{$key}{read_mask} & $field_information{$key}{mask}) << $field_information{$key}{shift};
+#            $write_mask |= ($field_information{$key}{write_mask} & $field_information{$key}{mask}) << $field_information{$key}{shift};
+#        }
+#
+#        if($reg_reps==-1){
+#            $content.=sprintf("# Register %s_%s_0\n",$regfile_name,$reg_name);
+#            $content.=sprintf("if '%s' not in registers:\n",$regfile_name);
+#            $content.=sprintf("    registers['%s'] = {}\n",$regfile_name);
+#            $content.=sprintf("    registers['%s']['register_list']  = []\n\n",$regfile_name);
+#            $content.=sprintf("registers['%s']['%s_0'] = {\n",$regfile_name,$reg_name);
+#            $content.=sprintf("    'addr'            : %s,\n",$reg_baseaddr);    
+#            $content.=sprintf("    'size'            : 0x%x,\n",$max-$min+1);
+#            $content.=sprintf("    'reset_val'       : 0x%x,\n",$reset_val);
+#            $content.=sprintf("    'reset_mask'      : 0x%x,\n",$reset_mask);
+#            $content.=sprintf("    'sw_default_val'  : 0x%x,\n",$sw_default);
+#            $content.=sprintf("    'sw_default_mask' : 0x%x,\n",$sw_default_mask);
+#            $content.=sprintf("    'read_mask'       : 0x%x,\n",$read_mask);
+#            $content.=sprintf("    'write_mask'      : 0x%x,\n",$write_mask); 
+#            foreach my $key (@fields_sort){
+#                $content.=sprintf("    '%s' : {\n",$key);
+#                $content.=sprintf("        'lsb'               : %d,\n",$field_information{$key}{shift});
+#                $content.=sprintf("        'msb'               : %d,\n",$field_information{$key}{width}-1+$field_information{$key}{shift});
+#                $content.=sprintf("        'size'              : %d,\n",$field_information{$key}{width});
+#                $content.=sprintf("        'field'             : (0x%x << %d),\n",$field_information{$key}{mask},$field_information{$key}{shift});
+#                $content.=sprintf("        'default'           : 0x%x,\n",$field_information{$key}{reset});
+#                $content.=sprintf("        'sw_default'        : 0x%x,\n",$field_information{$key}{sw_default});
+#                $content.=sprintf("        'action'            : '%s',\n",$field_information{$key}{usr_access});
+#                $content.=sprintf("        'enums' : {\n");
+#                if(exists $field_information{$key}{enums})
+#                {
+#                    my %enums=%{$field_information{$key}{enums}};
+#                    my @enums_sort=sort{$enums{$a} <=> $enums{$b}} keys %enums;
+#                    foreach my $enum_name (@enums_sort){
+#                        $content.=sprintf("            '%s' : 0x%x,\n",$enum_name,$enums{$enum_name});
+#                    }
+#                }
+#                $content.=sprintf("        },\n");
+#                $content.=sprintf("    },\n");
+#            }
+#            $content.=sprintf("    # Fields sorted in order of declaration in register\n");
+#            $content.=sprintf("    'field_list' : [\n");
+#            foreach my $key (@fields_sort){
+#                $content.=sprintf("        '%s',\n",$key);
+#            }
+#            $content.=sprintf("    ],\n");
+#            $content.=sprintf("} # End of register: %s_0\n\n",$reg_name);
+#            $content.=sprintf("registers['%s']['register_list'].append('%s_0')\n\n",$regfile_name,$reg_name);
+#        }else{
+#            $content.=sprintf("# Register %s_%s\n",$regfile_name,$reg_name);
+#            $content.=sprintf("if '%s' not in registers:\n",$regfile_name);
+#            $content.=sprintf("    registers['%s'] = {}\n",$regfile_name);
+#            $content.=sprintf("    registers['%s']['register_list']  = []\n\n",$regfile_name);
+#            $content.=sprintf("registers['%s']['%s'] = {\n",$regfile_name,$reg_name);
+#            $content.=sprintf("    'addr'            : 0x%x,\n",$reg_baseaddr);
+#            $content.=sprintf("    'size'            : 0x%x,\n",$max-$min+1);
+#            $content.=sprintf("    'reset_val'       : 0x%x,\n",$reset_val);
+#            $content.=sprintf("    'reset_mask'      : 0x%x,\n",$reset_mask);
+#            $content.=sprintf("    'sw_default_val'  : 0x%x,\n",$sw_default);
+#            $content.=sprintf("    'sw_default_mask' : 0x%x,\n",$sw_default_mask);
+#            $content.=sprintf("    'read_mask'       : 0x%x,\n",$read_mask);
+#            $content.=sprintf("    'write_mask'      : 0x%x,\n",$write_mask);
+#            foreach my $key (@fields_sort){
+#                $content.=sprintf("    '%s' : {\n",$key);
+#                $content.=sprintf("        'lsb'               : %d,\n",$field_information{$key}{shift});
+#                $content.=sprintf("        'msb'               : %d,\n",$field_information{$key}{width}-1+$field_information{$key}{shift});
+#                $content.=sprintf("        'size'              : %d,\n",$field_information{$key}{width});
+#                $content.=sprintf("        'field'             : (0x%x << %d),\n",$field_information{$key}{mask},$field_information{$key}{shift});
+#                $content.=sprintf("        'default'           : 0x%x,\n",$field_information{$key}{reset});
+#                $content.=sprintf("        'sw_default'        : 0x%x,\n",$field_information{$key}{sw_default});
+#                $content.=sprintf("        'action'            : '%s',\n",$field_information{$key}{usr_access});
+#                $content.=sprintf("        'enums' : {\n");
+#                if(exists $field_information{$key}{enums})
+#                {
+#                    my %enums=%{$field_information{$key}{enums}};
+#                    my @enums_sort=sort{$enums{$a} <=> $enums{$b}} keys %enums;
+#                    foreach my $enum_name (@enums_sort){
+#                        $content.=sprintf("            '%s' : 0x%x,\n",$enum_name,$enums{$enum_name});
+#                    }
+#                }
+#                $content.=sprintf("        },\n");
+#                $content.=sprintf("    },\n");
+#            }
+#            $content.=sprintf("    # Fields sorted in order of declaration in register\n");
+#            $content.=sprintf("    'field_list' : [\n");
+#            foreach my $key (@fields_sort){
+#                $content.=sprintf("        '%s',\n",$key);
+#            }
+#            $content.=sprintf("    ],\n");
+#            $content.=sprintf("} # End of register: %s\n\n",$reg_name);
+#            $content.=sprintf("registers['%s']['register_list'].append('%s')\n\n",$regfile_name,$reg_name);
+#            foreach my $index (0..$reg_reps-1){
+#                $reg_addr=$reg_baseaddr+$reg_incr*$index;
+#                $content.=sprintf("# Register %s_%s_%d\n",$regfile_name,$reg_name,$index);
+#                $content.=sprintf("if '%s' not in registers:\n",$regfile_name);
+#                $content.=sprintf("    registers['%s'] = {}\n",$regfile_name);
+#                $content.=sprintf("    registers['%s']['register_list']  = []\n\n",$regfile_name);
+#                $content.=sprintf("registers['%s']['%s_%d'] = {\n",$regfile_name,$reg_name,$index);
+#                $content.=sprintf("    'addr'            : 0x%x,\n",$reg_addr);
+#                $content.=sprintf("    'size'            : 0x%x,\n",$max-$min+1);
+#                $content.=sprintf("    'reset_val'       : 0x%x,\n",$reset_val);
+#                $content.=sprintf("    'reset_mask'      : 0x%x,\n",$reset_mask);
+#                $content.=sprintf("    'sw_default_val'  : 0x%x,\n",$sw_default);
+#                $content.=sprintf("    'sw_default_mask' : 0x%x,\n",$sw_default_mask);
+#                $content.=sprintf("    'read_mask'       : 0x%x,\n",$read_mask);
+#                $content.=sprintf("    'write_mask'      : 0x%x,\n",$write_mask);
+#                foreach my $key (@fields_sort){
+#                    $content.=sprintf("    '%s' : {\n",$key);
+#                    $content.=sprintf("        'lsb'               : %d,\n",$field_information{$key}{shift});
+#                    $content.=sprintf("        'msb'               : %d,\n",$field_information{$key}{width}-1+$field_information{$key}{shift});
+#                    $content.=sprintf("        'size'              : %d,\n",$field_information{$key}{width});
+#                    $content.=sprintf("        'field'             : (0x%x << %d),\n",$field_information{$key}{mask},$field_information{$key}{shift});
+#                    $content.=sprintf("        'default'           : 0x%x,\n",$field_information{$key}{reset});
+#                    $content.=sprintf("        'sw_default'        : 0x%x,\n",$field_information{$key}{sw_default});
+#                    $content.=sprintf("        'action'            : '%s',\n",$field_information{$key}{usr_access});
+#                    $content.=sprintf("        'enums' : {\n");
+#                    if(exists $field_information{$key}{enums})
+#                    {
+#                        my %enums=%{$field_information{$key}{enums}};
+#                        my @enums_sort=sort{$enums{$a} <=> $enums{$b}} keys %enums;
+#                        foreach my $enum_name (@enums_sort){
+#                            $content.=sprintf("            '%s' : 0x%x,\n",$enum_name,$enums{$enum_name});
+#                        }
+#                    }
+#                    $content.=sprintf("        },\n"); 
+#                    $content.=sprintf("    },\n");
+#               }
+#               $content.=sprintf("    # Fields sorted in order of declaration in register\n");
+#               $content.=sprintf("    'field_list' : [\n");
+#               foreach my $key (@fields_sort){
+#                    $content.=sprintf("        '%s',\n",$key);
+#               }
+#               $content.=sprintf("    ],\n");
+#               $content.=sprintf("} # End of register: %s_%d\n\n",$reg_name,$index);
+#               $content.=sprintf("registers['%s']['register_list'].append('%s_%d')\n\n",$regfile_name,$reg_name,$index); 
+#            }
+#        }
+#        $content.="\n\n";
+#     }
+#  }
+#  $content.=sprintf("\n##\n## ADDRESS SPACES\n##\n\n");
+#  foreach my $key_regfile(@regsets){
+#    %regfile=%{$key_regfile};
+#    $regfile_name=${$regfile{id}}[0];
+#    $regfile_baseaddr=${$regfile{baseaddr}}[0];
+#    if($regfile_baseaddr !~ /0x|0X/)
+#    {
+#        if($regfile_baseaddr =~ /\A0|0b\d+/){
+#            $regfile_baseaddr = oct($regfile_baseaddr);
+#        }
+#        $regfile_baseaddr = sprintf("0x%x",$regfile_baseaddr);
+#    }
+#    $content.=sprintf("addr_spaces['%s'] = %s;\n",$regfile_name,$regfile_baseaddr);
+#  }
+#  open FILE,'>',"$OutDir/$basename.py" or die $!;
+#  print FILE $content;
+#  close FILE; 
+#}
 
 #main
 if(!@ARGV)
@@ -914,9 +914,9 @@ if($header){
 if($vh){
     emit_v;
 }
-if($py){
-    emit_py;
-}
+#if($py){
+#    emit_py;
+#}
 if($uh){
     emit_uh;
 }

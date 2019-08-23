@@ -18,7 +18,8 @@ output systemverilog {
 	suppress_no_reset_warnings = true       // inhibit field no reset messages
 	include_default_coverage = false        // include default cover points in rtl
 	use_async_resets = true                 // registers will use asynchronous reset
-    //root_decoder_interface = parallel_pulsed // parallel | parallel_pulsed | leaf | serial8 | ring8 | ring16 | ring32 
+    root_decoder_interface = parallel       // parallel | parallel_pulsed | leaf | serial8 | ring8 | ring16 | ring32 
+    optimize_parallel_externals = true
 }
 
                                             // jspec output parameters
