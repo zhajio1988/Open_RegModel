@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{%- block content %}
+<table border="1">
+    <tr>
+        <th>Offset</th>
+        <th>Identifier</th>
+        <th>Name</th>
+        <th></th>
+    </tr>
+    {%- set addr_digits = get_child_addr_digits(node) -%}
+    {%- for child_id,child in children.items() %}
+    <tr id="{{child.inst.inst_name}}">
+        <td class="address">{{"0x{n:0{width}X}".format(n=child.inst.addr_offset, width=addr_digits)}}</td>
+        <td><a href="?p={{child.get_path(empty_array_suffix='')}}" data-id="{{child_id}}" onclick="onClickNodeLink(event); return(false)">
+            {%- if child.inst.is_array -%}
+                {{child.inst.inst_name}}{{child.inst.array_dimensions}}
+            {%- else -%}
+                {{child.inst.inst_name}}
+            {%- endif -%}
+        </a></td>
+        <td>{{child.get_property("name", default="-")}}</td>
+        <td>
+            <a class="headerlink" href="#{{child.inst.inst_name}}" title="Permalink to this row"></a>
+        </td>
+    </tr>
+    {%- endfor %}
+</table>
+{%- endblock %}

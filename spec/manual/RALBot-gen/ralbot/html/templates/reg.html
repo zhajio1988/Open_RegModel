@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{%- block content -%}
+<table border="1">
+    <tr>
+        <th>Bits</th>
+        <th>Identifier</th>
+        <th>Access</th>
+        <th>Reset</th>
+        <th>Decoded</th>
+        <th>Name</th>
+        <th></th>
+    </tr>
+    {%- for field in reversed(list(node.fields())) %}
+    <tr id="{{field.inst.inst_name}}">
+        {%- if field.inst.msb == field.inst.lsb %}
+        <td>[{{field.inst.lsb}}]</td>
+        {%- else %}
+        <td>[{{field.inst.msb}}:{{field.inst.lsb}}]</td>
+        {%- endif %}
+        <td>
+            {%- if (has_description(field) or has_enum_encoding(field)) -%}
+                <a href="#{{field.inst.inst_name}}.desc">{{field.inst.inst_name}}</a>
+            {%- else -%}
+                {{- field.inst.inst_name -}}
+            {%- endif -%}
+        </td>
+        <td>
+            {{- field.get_property("sw").name -}}
+            {%- if field.get_property("onread") -%}
+                , {{ field.get_property("onread").name -}}
+            {%- endif -%}
+            {%- if field.get_property("onwrite") -%}
+                , {{ field.get_property("onwrite").name -}}
+            {%- endif -%}
+        </td>
+        <td>
+            {%- if field.get_property("reset") != None -%}
+            {{"0x%x" % field.get_property("reset")}}
+            {%- else -%}
+            -
+            {%- endif %}
+        </td>
+        <td>
+            <input id="_FieldValueTester{{field.inst.inst_name}}" class="field-value-tester"
+                type="text" autocomplete="off"
+                data-name="{{field.inst.inst_name}}" oninput="onDecodedFieldInput(this)"/>
+        </td>
+        <td>{{field.get_property("name", default="-")}}</td>
+        <td>
+            <button type="button" id="_RadixButton{{field.inst.inst_name}}" class="radix-button"
+                title="Switch radix" aria-label="Switch radix"
+                data-name="{{field.inst.inst_name}}" onclick="onRadixSwitch(this)">H</button>
+            <a class="headerlink" href="#{{field.inst.inst_name}}" title="Permalink to this row"></a>
+        </td>
+    </tr>
+    {%- endfor %}
+</table>
+<p>
+    <label>
+        Encoded Register Value:
+        <input id="_RegValueTester" type="text" autocomplete="off" oninput="onEncodedRegInput(this)"/>
+        <button type="button" class="reset-button" title="Reset register values" aria-label="Reset register values" onclick="reset_field_inputs()"></button>
+    </label>
+    {{- user_macros.reg_value_edit_extra() }}
+</p>
+
+{%- for field in reversed(list(node.fields())) if (has_description(field) or has_enum_encoding(field)) %}
+{%- if loop.first %}
+<hr/><h2>Field Descriptions</h2>
+{%- endif %}
+{% include "field_description.html" %}
+{%- endfor %}
+
+{%- endblock %}

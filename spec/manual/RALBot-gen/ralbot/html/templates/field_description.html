@@ -1,0 +1,17 @@
+{%- import "macros.html" as macros with context %}
+<h3 id="{{field.inst.inst_name}}.desc">
+    {%- if field.get_property("name", default="") == "" -%}
+        {{- field.inst.inst_name -}}
+    {%- else -%}
+        {{- field.inst.inst_name}} - {{field.get_property("name") -}}
+    {%- endif %}
+    <a class="headerlink" href="#{{field.inst.inst_name}}.desc" title="Permalink to this headline"></a>
+</h3>
+
+{%- if has_description(field) %}
+{{get_node_desc(field,3)|safe}}
+{%- endif %}
+
+{%- if has_enum_encoding(field) %}
+{{ macros.enum_table(field.get_property("encode")) }}
+{%- endif %}

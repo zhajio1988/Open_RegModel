@@ -1,0 +1,25 @@
+{%- import "user_macros.html" as user_macros with context -%}
+<div>
+<h1>{{node.get_property("name")}}</h1>
+
+<dl class="node-info">
+    <dt>Absolute Address:</dt><dd id="_AbsAddr" class="address"></dd>
+    <dt>Base Offset:</dt><dd class="address">{{"0x%x" % node.raw_address_offset}}</dd>
+    <dt>Size:</dt><dd class="address">{{"0x%x" % node.size}}</dd>
+    {%- if node.inst.is_array %}
+    <dt>Array Dimensions:</dt><dd>{{node.inst.array_dimensions}}</dd>
+    <dt>Array Stride:</dt><dd>+{{"0x%x" % node.inst.array_stride}}</dd>
+    <dt>Total Size:</dt><dd class="address">{{"0x%x" % node.total_size}}</dd>
+    {%- endif %}
+    {{- user_macros.node_info_extra() }}
+</dl>
+
+{%- if has_description(node) %}
+<h2>Description</h2>
+{{get_node_desc(node,2)|safe}}
+{%- endif %}
+
+<h2>Contents</h2>
+{% block content %}{% endblock %}
+{{- user_macros.contents_extra() }}
+</div>

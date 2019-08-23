@@ -1,0 +1,586 @@
+html{
+    background-color: #eee;
+    font-family: "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif;
+    font-weight: normal;
+    color: #404040;
+}
+
+a {
+    text-decoration: none;
+    color: #2980b9;
+}
+
+a:hover {
+    color: #3091d1;
+}
+
+:not(html) {
+    line-height: inherit;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    font-family: "Roboto Slab","ff-tisa-web-pro","Georgia",Arial,sans-serif;
+    color: #404040;
+}
+
+table {
+    border: solid 1px #e1e4e5;
+    border-collapse: collapse;
+    empty-cells: show;
+}
+
+th {
+    border-bottom: solid 2px #e1e4e5;
+    font-weight: bold;
+}
+
+td, th {
+    border-color: #e1e4e5;
+    padding: 0.5em;
+}
+
+td:first-child, th:first-child {
+    border-left-width: 0;
+}
+
+tr:nth-child(2n) td {
+    background-color: #f3f6f6;
+}
+
+td > p:first-child {
+    margin-top: 0px;
+}
+
+td > p:last-child {
+    margin-bottom: 0px;
+}
+
+hr {
+    border: 0;
+    border-top: solid 1px #e1e4e5;
+    margin: 1em 0em;
+}
+
+dt {
+    font-weight: bold;
+}
+
+pre {
+    background-color: rgb(238, 255, 204);
+    border: solid 1px rgb(225, 228, 229);
+    padding: 0.75em;
+}
+
+blockquote {
+    margin-left: 0px;
+    padding-left: 0.25em;
+    border-left: solid 0.313em #ccc;
+}
+
+code {
+    font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",Courier,monospace;
+    font-size: 0.75em;
+    line-height: 1.4;
+}
+
+input.invalid {
+    background-color: #f99;
+}
+
+/*:target, :target td {*/
+.target-highlight, .target-highlight td {
+    background-color: #f1c40f!important;
+}
+
+mark {
+    background-color: #f1c40f;
+}
+
+/* ------------------------------- Admonitions ------------------------------ */
+.admonition-title:before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: bold;
+    content: "\f06a";
+    margin-right:4px;
+}
+
+.admonition {
+    padding:12px;
+    line-height:24px;
+    margin-bottom:24px;
+    background:#e7f2fa;
+}
+
+.admonition-title {
+    color:#fff;
+    font-weight:bold;
+    display:block;
+    color:#fff;
+    background:#6ab0de;
+    margin:-12px;
+    padding:6px 12px;
+    margin-bottom:12px;
+}
+
+.admonition p:last-child {
+    margin-bottom:0;
+}
+
+.admonition.danger,
+.admonition.error{
+    background:#fdf3f2;
+}
+
+.admonition.danger .admonition-title,
+.admonition.error .admonition-title{
+    background:#f29f97;
+}
+
+.admonition.attention,
+.admonition.caution,
+.admonition.warning {
+    background:#ffedcc;
+}
+
+.admonition.attention .admonition-title,
+.admonition.caution .admonition-title,
+.admonition.warning .admonition-title {
+    background:#f0b37e;
+}
+
+.admonition.note,
+.admonition.seealso {
+    background:#e7f2fa;
+}
+
+.admonition.note .admonition-title,
+.admonition.seealso .admonition-title {
+    background:#6ab0de;
+}
+
+.admonition.hint,
+.admonition.important,
+.admonition.tip {
+    background:#dbfaf4;
+}
+
+.admonition.hint .admonition-title,
+.admonition.important .admonition-title,
+.admonition.tip .admonition-title {
+    background:#1abc9c;
+}
+
+/* ------------------------------- Button Icons ----------------------------- */
+
+.expand-button::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: bold;
+    content: "\f0fe";
+}
+
+.collapse-button::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: bold;
+    content: "\f146";
+}
+
+.search-button::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: bold;
+    content: "\f002";
+}
+
+.close-button::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: bold;
+    content: "\f00d";
+}
+
+.menu-button::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: bold;
+    content: "\f0c9";
+}
+
+.home-button::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: bold;
+    content: "\f015";
+}
+
+.copy-button::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: normal;
+    content: "\f0c5";
+}
+
+.reset-button::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: bold;
+    content: "\f2ea";
+}
+
+/* --------------------------------- Sidebar -------------------------------- */
+#_SBTitlebar {
+    background-color: rgb(41, 128, 185);
+}
+
+#_SBTitlebox {
+    font-size: 1.125em;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 2.2em;
+
+    color: #fff;
+}
+
+#_SBResizer:hover {
+    background-color: rgba(128, 128, 128, 0.5);
+}
+
+.sb-button-strip {
+    padding: 0em 0.313em;
+}
+
+.sb-button-strip button, .sb-button-strip a.button-link{
+    background-color: inherit;
+    border: none;
+    width: 1.25em;
+    height: 1.25em;
+    font-size: 1.5em;
+    text-align: center;
+    vertical-align: middle;
+    color: #fff;
+    padding: 0em;
+}
+
+.sb-button-strip button:hover, .sb-button-strip a.button-link:hover{
+    background-color: #2e8ece;
+    border: none;
+}
+
+#_SBTreeContainer {
+    background-color: #303030;
+    color: #d9d9d9;
+}
+
+#_SBTree {
+    padding-top: 0.5em;
+}
+
+#_SBTree a {
+    color: inherit;
+}
+
+.node {
+    line-height: 1.3em;
+    border-color: #303030;
+    border-top-style: solid;
+    border-top-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-left-style: solid;
+    border-left-width: 1px;
+}
+
+.node-icon {
+    width: 1.25em;
+    text-align: center;
+}
+
+.node:hover{
+    background-color: #4e4a4a;
+}
+
+.node.open .node-icon::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: normal;
+    content: "\f146";
+}
+
+.node.closed .node-icon::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: normal;
+    content: "\f0fe";
+}
+
+.node.leaf .node-icon::before {
+    font-weight: normal;
+    content: "\2022";
+}
+
+.node.selected {
+    background-color: #fff;
+    color: #444;
+    font-weight: bold;
+    border-color: #c9c9c9;
+}
+
+.node.selected a:focus {
+    outline: none;
+}
+
+/* ----------------------------- Mobile Titlebar ---------------------------- */
+#_MobiTitlebar {
+    background-color: rgb(41, 128, 185);
+    color: #fff;
+}
+
+#_MobiTitlebox {
+    vertical-align: middle;
+    font-size: 1.125em;
+    font-weight: bold;
+    text-align: center;
+    line-height: 2em;
+}
+
+#_MobiTitlebar button{
+    background-color: inherit;
+    border: none;
+    font-size: 1.5em;
+    width: 1.5em;
+    height: 1.5em;
+    line-height: 1.5em;
+    text-align: center;
+    vertical-align: middle;
+    color: #fff;
+    padding: 0em;
+}
+
+#_MobiTitlebar button:hover{
+    background-color: #2e8ece;
+    border: none;
+}
+/* ------------------------------- Main Window ------------------------------ */
+
+.main {
+    background-color: #fff;
+    padding-left: 1.875em;
+    padding-right: 1.875em;
+}
+
+#_Crumbtrail {
+    padding-top: 0.875em;
+}
+
+.crumb-separator {
+    padding: 0em 0.25em;
+}
+
+.crumb-idx {
+    font-weight: bold;
+    padding: 0.07em;
+}
+
+.crumb-idx:hover{
+    background-color: #2e8ece;
+    color: #fff;
+}
+
+dl.node-info {
+    display: grid;
+    justify-content: start;
+}
+
+.node-info dt{
+  grid-column: 1; 
+}
+
+.node-info dd {
+  grid-column: 2;
+  margin-left: 0.5em;
+}
+
+input.field-value-tester {
+    border: solid 1px #aaa;
+    padding: 0.25em 0.5em;
+    width: 7em;
+}
+
+input#_RegValueTester {
+    border: solid 1px #aaa;
+    padding: 0.25em 0.5em;
+    width: 8em;
+}
+
+footer {
+    padding-bottom: 0.875em;
+    color: #808080;
+}
+
+.headerlink {
+    visibility: hidden;
+}
+
+.headerlink::after {
+    font-family: "Font Awesome 5 Free";
+    font-size: 0.75em;
+    font-weight: bold;
+    content: "\f0c1";
+}
+
+.radix-button {
+    font-size: 0.79em;
+    font-weight: bold;
+    padding: 0.25em 0.48em;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #949494;
+    border-radius: 2px;
+    background-color: #eee;
+    background-image: linear-gradient(#f5f5f5, #dddddd);
+}
+
+h1:hover .headerlink::after,
+h2:hover .headerlink::after,
+h3:hover .headerlink::after,
+h4:hover .headerlink::after,
+tr:hover .headerlink::after {
+    visibility: visible;
+}
+
+/* --------------------------------- Search --------------------------------- */
+#_SearchBar {
+    padding-top: 0.875em;
+    padding-bottom: 0.875em;
+}
+
+#_SearchBar input {
+    border: solid 1px #aaa;
+    padding: 0.5em 1em;
+    font-size: 1.125em;
+}
+
+
+#_SearchResults {
+    padding: 0em;
+    width: 100%;
+}
+
+#_SearchResults li:first-child {
+    border-top: solid 1px #e1e4e5;
+}
+
+#_SearchResults li {
+    display: block;
+    width: 100%;
+    padding: 0.5em 0em;
+    border-bottom: solid 1px #e1e4e5;
+}
+
+#_SearchResults .selected {
+    background-color: #f3f6f6;
+    /*background-color: #ddd;*/
+}
+
+/* --------------------------- Index Editor Modal --------------------------- */
+#_IdxEditModal {
+    background-color: #2e8ece;
+    box-shadow: rgba(0, 0, 0, 0.25) 1px 3px 6px 1px;
+}
+
+#_IdxEditModal::before {
+    border-bottom-color: #2e8ece;
+}
+
+#_IdxEditInput {
+    border: solid 1px #2472a4;
+    padding: 0.25em 0.5em;
+}
+
+#_IdxEditRange {
+    color: #fff;
+}
+
+/* ---------------------------------- Fonts --------------------------------- */
+@font-face {
+    font-family:"Lato";
+    font-weight:400;
+    font-style:normal;
+    src:url("../fonts/Lato/lato-regular.eot");
+    src:url("../fonts/Lato/lato-regular.eot?#iefix") format("embedded-opentype"),
+        url("../fonts/Lato/lato-regular.woff2") format("woff2"),
+        url("../fonts/Lato/lato-regular.woff") format("woff"),
+        url("../fonts/Lato/lato-regular.ttf") format("truetype");
+}
+@font-face {
+    font-family:"Lato";
+    font-weight:700;
+    font-style:normal;
+    src:url("../fonts/Lato/lato-bold.eot");
+    src:url("../fonts/Lato/lato-bold.eot?#iefix") format("embedded-opentype"),
+        url("../fonts/Lato/lato-bold.woff2") format("woff2"),
+        url("../fonts/Lato/lato-bold.woff") format("woff"),
+        url("../fonts/Lato/lato-bold.ttf") format("truetype");
+}
+@font-face {
+    font-family:"Lato";
+    font-weight:700;
+    font-style:italic;
+    src:url("../fonts/Lato/lato-bolditalic.eot");
+    src:url("../fonts/Lato/lato-bolditalic.eot?#iefix") format("embedded-opentype"),
+        url("../fonts/Lato/lato-bolditalic.woff2") format("woff2"),
+        url("../fonts/Lato/lato-bolditalic.woff") format("woff"),
+        url("../fonts/Lato/lato-bolditalic.ttf") format("truetype");
+}
+@font-face {
+    font-family:"Lato";
+    font-weight:400;
+    font-style:italic;
+    src:url("../fonts/Lato/lato-italic.eot");
+    src:url("../fonts/Lato/lato-italic.eot?#iefix") format("embedded-opentype"),
+        url("../fonts/Lato/lato-italic.woff2") format("woff2"),
+        url("../fonts/Lato/lato-italic.woff") format("woff"),
+        url("../fonts/Lato/lato-italic.ttf") format("truetype");
+}
+@font-face {
+    font-family:"Roboto Slab";
+    font-weight:400;
+    font-style:normal;
+    src:url("../fonts/RobotoSlab/roboto-slab.eot");
+    src:url("../fonts/RobotoSlab/roboto-slab-v7-regular.eot?#iefix") format("embedded-opentype"),
+        url("../fonts/RobotoSlab/roboto-slab-v7-regular.woff2") format("woff2"),
+        url("../fonts/RobotoSlab/roboto-slab-v7-regular.woff") format("woff"),
+        url("../fonts/RobotoSlab/roboto-slab-v7-regular.ttf") format("truetype")
+}
+@font-face {
+    font-family:"Roboto Slab";
+    font-weight:700;
+    font-style:normal;
+    src:url("../fonts/RobotoSlab/roboto-slab-v7-bold.eot");
+    src:url("../fonts/RobotoSlab/roboto-slab-v7-bold.eot?#iefix") format("embedded-opentype"),
+        url("../fonts/RobotoSlab/roboto-slab-v7-bold.woff2") format("woff2"),
+        url("../fonts/RobotoSlab/roboto-slab-v7-bold.woff") format("woff"),
+        url("../fonts/RobotoSlab/roboto-slab-v7-bold.ttf") format("truetype")
+}
+
+
+/*!
+ * Font Awesome Free 5.3.1 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+ */
+@font-face {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-style: normal;
+    src:url("../fonts/FontAwesome/fa-solid-900.eot");
+    src:url("../fonts/FontAwesome/fa-solid-900.eot?#iefix") format("embedded-opentype"),
+        url("../fonts/FontAwesome/fa-solid-900.woff2") format("woff2"),
+        url("../fonts/FontAwesome/fa-solid-900.woff") format("woff"),
+        url("../fonts/FontAwesome/fa-solid-900.ttf") format("truetype"),
+        url("../fonts/FontAwesome/fa-solid-900.svg#fontawesome") format("svg");
+}
+
+@font-face {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 400;
+    font-style: normal;
+    src:url("../fonts/FontAwesome/fa-regular-400.eot");
+    src:url("../fonts/FontAwesome/fa-regular-400.eot?#iefix") format("embedded-opentype"),
+        url("../fonts/FontAwesome/fa-regular-400.woff2") format("woff2"),
+        url("../fonts/FontAwesome/fa-regular-400.woff") format("woff"),
+        url("../fonts/FontAwesome/fa-regular-400.ttf") format("truetype"),
+        url("../fonts/FontAwesome/fa-regular-400.svg#fontawesome") format("svg");
+}

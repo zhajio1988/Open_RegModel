@@ -1,0 +1,19 @@
+{%- macro enum_table(enum) -%}
+<table border="1">
+    <tr>
+        <th colspan="3">enum {{enum.__name__}}</th>
+    </tr>
+    {%- for member in enum %}
+    <tr>
+        <td>{{member.name}}</td>
+        <td>{{"0x%x" % member.value}}</td>
+        <td>
+            {%- if member.rdl_name %}
+                <em>{{member.rdl_name}}</em>
+            {% endif %}
+            {{- get_enum_desc(member)|safe -}}
+        </td>
+    </tr>
+    {%- endfor %}
+</table>
+{%- endmacro %}

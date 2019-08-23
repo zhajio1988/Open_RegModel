@@ -1,0 +1,97 @@
+{%- import "user_macros.html" as user_macros with context -%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{{title}}</title>
+    <style>
+        html{box-sizing:border-box}*,*:before,*:after{box-sizing:inherit}
+    </style>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <script src="js/BigInteger.min.js" type="text/javascript"></script>
+    <script src="js/data.js" type="text/javascript"></script>
+    <script src="js/ral.js" type="text/javascript"></script>
+    <script src="js/main.js" type="text/javascript"></script>
+    <script src="js/nav.js" type="text/javascript"></script>
+    <script src="js/sidebar.js" type="text/javascript"></script>
+    <script src="js/index_edit.js" type="text/javascript"></script>
+    <script src="js/field_testers.js" type="text/javascript"></script>
+    <script src="js/search.js" type="text/javascript"></script>
+    {{- user_macros.html_head_extra() }}
+</head>
+
+<body class="pack-h" onload="onPageLoad()">
+    <div id="_Sidebar" class="no-stretchy pack-h">
+        <div id="_SBContents" class="pack-v stretchy">
+            <div id="_SBTitlebar" class="no-stretchy">
+                <div id="_SBTitlebox">{{title}}</div>
+                <div class="sb-button-strip pack-h">
+                    {%- if home_url != None %}
+                    <a class="button-link home-button no-stretchy" href="{{home_url}}"></a>
+                    <span class="stretchy"></span>
+                    {%- endif %}
+                    <button type="button" class="expand-button no-stretchy" title="Expand All" aria-label="Expand All" onclick="onClickTreeExpandAll()"></button>
+                    <button type="button" class="collapse-button no-stretchy" title="Collapse All" aria-label="Collapse All" onclick="onClickTreeCollapseAll()"></button>
+                    <span class="stretchy"></span>
+                    {{- user_macros.button_strip_extra() }}
+                    <button type="button" id="_SBSearchButton" class="search-button no-stretchy" title="Search" aria-label="Search" onclick="onSearchButtonClick()"></button>
+                </div>
+            </div>
+            <div id="_SBTreeContainer" class="stretchy scroll-v scroll-h">
+                <div id="_SBTree"></div>
+            </div>
+        </div>
+        <div id="_SBResizer""></div>
+    </div>
+    
+    <div id="_MainPane" class="stretchy pack-v">
+        <header id="_MobiTitlebar" class="no-stretchy pack-h">
+            <button type="button" class="menu-button no-stretchy" title="Show sidebar" aria-label="Show sidebar" onclick="sidebar_open()"></button>
+            <div id="_MobiTitlebox" class="stretchy">{{title}}</div>
+            <button type="button" id="_MobiSearchButton" class="search-button no-stretchy" title="Search" aria-label="Search" onclick="onSearchButtonClick()"></button>
+        </header>
+        
+        <div id="_SearchBar" class="no-stretchy main limit-h">
+            <form>
+                <input type="search" id="_SearchInput" aria-label="Search input" placeholder="Search by name or @address" autocomplete="off"/>
+            </form>
+        </div>
+        
+        <div class="scroll-v pack-v stretchy">
+            <div id="_Content" class="main limit-h">
+                <div id="_Crumbtrail"></div>
+                <hr/>
+                <div id="_ContentContainer"></div>
+            </div>
+            
+            <div id="_Search" class="main limit-h">
+                <ul id="_SearchResults">
+                </ul>
+            </div>
+            
+            <div class="main stretchy limit-h"></div>
+            <footer class="main limit-h">
+                <hr/>
+                {{ user_macros.footer() }}
+            </footer>
+        </div>
+        
+        <div id="_Overlay" onclick="sidebar_close()"></div>
+    </div>
+
+    {{- user_macros.body_extra() }}
+</body>
+
+<div id="_IdxEditModal">
+    <form>
+        <input type="text" id="_IdxEditInput" aria-label="edit index" autocomplete="off">
+    </form>
+    <span id="_IdxEditRange"></span>
+</div>
+
+{{- user_macros.html_extra() }}
+</html>
