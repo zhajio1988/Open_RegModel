@@ -42,4 +42,6 @@ In this repository, you will find:
 | *_reg.v                 | Register RTL file          |
 
 ## Using the openreg tools
-   ./tools/bin/tmake 
+
+`%> ./tools/bin/tmake`
+
