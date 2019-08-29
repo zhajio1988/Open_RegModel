@@ -33,5 +33,13 @@ In this repository, you will find:
     └── make
 ```
 
+| Directory               | Name	Description        |
+|---                      |---                         |
+| *.h                     | C header files             |
+| *.svh                   | SystemVerilog header files |
+| *_uvmreg.sv/*uvm_reg.sv | UVM register model         |
+| */docs                  | Html document              |
+| *_reg.v                 | Register RTL file          |
+
 ## Using the openreg tools
    ./tools/bin/tmake 
