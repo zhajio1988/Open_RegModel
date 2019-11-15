@@ -20,6 +20,7 @@ output systemverilog {
 	use_async_resets = true                 // registers will use asynchronous reset
     root_decoder_interface = parallel       // parallel | parallel_pulsed | leaf | serial8 | ring8 | ring16 | ring32 
     optimize_parallel_externals = true
+    include_sequential_assign_delays= false // not include #1 delay on sequential assigns    
 }
 
                                             // jspec output parameters
