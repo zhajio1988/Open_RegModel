@@ -42,6 +42,6 @@ In this repository, you will find:
 | *_reg.v                 | Register RTL file          |
 
 ## Using the openreg tools
-
+first， modify tree.make，change tools path to your supports
 `%> ./tools/bin/tmake`
 
